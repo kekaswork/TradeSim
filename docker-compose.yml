@@ -64,13 +64,15 @@ services:
       - postgres
       - kafka
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      DATABASE_URL: ${DATABASE_URL}
       KAFKA_BROKER: kafka:9092
       JWT_SECRET: ${JWT_SECRET}
     ports:
       - "8081:8080"
     networks:
       - backend
+    env_file:
+      - ./backend/services/auth/.env
 
   # Frontend
 
