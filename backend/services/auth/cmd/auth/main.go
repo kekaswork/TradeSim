@@ -1,7 +1,20 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/kekaswork/TradeSim/backend/services/auth/config"
+)
+
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
+)
 
 func main() {
-	fmt.Printf("Auth Service is running...\n")
+	cfg := config.MustLoad()
+	_ = cfg
+
+	fmt.Printf("config: %v", cfg)
 }

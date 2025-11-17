@@ -3,7 +3,7 @@ include $(ENV_FILE)
 export
 
 run:
-	go run ./cmd/auth
+	go run ./cmd/auth --config=./config/local.yaml
 
 build:
 	go build -o auth-service ./cmd/auth

@@ -1,0 +1,5 @@
+env: "local"
+database:
+  max_connections: 10
+jwt:
+  ExpirationMinutes: 60
