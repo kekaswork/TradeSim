@@ -1,0 +1,81 @@
+version: '3.9'
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: tradesim_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  adminer:
+    image: adminer:4.8.1
+    container_name: tradesim_adminer
+    restart: unless-stopped
+    ports:
+      - "8088:8080"
+    environment:
+      ADMINER_DESIGN: pepa-linha
+    networks:
+      - backend
+    depends_on:
+      - postgres
+
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.1
+    container_name: tradesim_zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+      - "2181:2181"
+    networks:
+      - backend
+
+  kafka:
+    image: confluentinc/cp-kafka:7.6.1
+    container_name: tradesim_kafka
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "9092:9092"
+    networks:
+      - backend
+
+
+  auth-service:
+    build: ./backend/services/auth
+    container_name: tradesim_auth
+    depends_on:
+      - postgres
+      - kafka
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      KAFKA_BROKER: kafka:9092
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8081:8080"
+    networks:
+      - backend
+
+  # Frontend
+
+networks:
+  backend:
+
+volumes:
+  postgres_data:
