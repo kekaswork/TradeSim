@@ -22,4 +22,4 @@ migrate-down:
 		-v "$(PWD)/migrations:/migrations" \
 		migrate/migrate \
 		-path /migrations \
-		-database $(DATABASE_URL) down
+		-database $(DATABASE_URL) down 1
